@@ -29,7 +29,11 @@ class MainActivity : AppCompatActivity() {
             val users = userDao?.getUsers()
             runOnUiThread {
                 users?.let {
-                    adapter = UsersRecyclerAdapter(users.toMutableList())
+                    adapter = UsersRecyclerAdapter(users.toMutableList()) {
+                        thread {
+                            userDao?.deleteUser(it)
+                        }
+                    }
                     recyclerView.adapter = adapter
                 }
             }
@@ -49,8 +53,7 @@ class MainActivity : AppCompatActivity() {
                 val user = User(name = customLayout.editName.text.toString(), age = 42)
                 userDao?.insertUsers(user)
                 runOnUiThread {
-                    adapter.users.add(user)
-                    adapter.notifyItemInserted(adapter.itemCount)
+                    adapter.addUser(user)
                     dialog.dismiss()
                 }
             }
